@@ -944,7 +944,7 @@ namespace NetDaemon.Daemon
                 {
                     try
                     {
-                        var rxEvent = new RxEvent(serviceCallData.Service, serviceCallData.Domain, serviceCallData.ServiceData);
+                        var rxEvent = new RxEvent(serviceCallData.Service, serviceCallData.Domain, serviceCallData.ServiceData, serviceCallData.ServiceData);
                         observer.OnNext(rxEvent);
                     }
                     catch (Exception e)
@@ -991,7 +991,7 @@ namespace NetDaemon.Daemon
                 {
                     try
                     {
-                        var rxEvent = new RxEvent(hassEvent.EventType, null, hassEvent.Data);
+                        var rxEvent = new RxEvent(hassEvent.EventType, null, hassEvent.Data, hassEvent.DataElement);
                         observer.OnNext(rxEvent);
                     }
                     catch (Exception e)

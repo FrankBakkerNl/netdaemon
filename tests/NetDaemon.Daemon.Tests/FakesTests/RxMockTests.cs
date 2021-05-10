@@ -301,7 +301,7 @@ namespace NetDaemon.Daemon.Tests.Reactive
             app.Initialize();
 
             // ACT
-            TriggerEvent(new RxEvent("hello_event", "some_domain", null));
+            TriggerEvent(new RxEvent("hello_event", "some_domain", null, null));
 
             // ASSERT
             Verify(x => x.Entity("light.livingroom").TurnOn(It.IsAny<object>()), Times.Once);

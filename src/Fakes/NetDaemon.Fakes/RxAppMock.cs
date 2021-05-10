@@ -231,7 +231,7 @@ namespace NetDaemon.Daemon.Fakes
             {
                 try
                 {
-                    observer.OnNext(new RxEvent(haEvent, domain, data));
+                    observer.OnNext(new RxEvent(haEvent, domain, data, null));
                 }
                 catch (Exception e)
                 {
