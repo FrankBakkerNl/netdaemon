@@ -243,6 +243,9 @@ namespace NetDaemon.Daemon.Tests.DaemonRunner.Config
             - cool!
             devices:
             - name: tv
+              adresses:
+                host: mytv.local
+                ip: 192.168.2.113
               commands:
                 - name: command1
                   data: some code
@@ -273,6 +276,8 @@ namespace NetDaemon.Daemon.Tests.DaemonRunner.Config
             Assert.Equal("some code", instance?.Devices?.First()?.Commands?.ElementAt(0).Data);
             Assert.Equal("command2", instance?.Devices?.First()?.Commands?.ElementAt(1).Name);
             Assert.Equal("some code2", instance?.Devices?.First()?.Commands?.ElementAt(1).Data);
+            Assert.Equal("mytv.local", instance?.Devices?.First()?.Adresses.Host);
+            Assert.Equal("192.168.2.113", instance?.Devices?.First()?.Adresses.Ip);
         }
     }
 }

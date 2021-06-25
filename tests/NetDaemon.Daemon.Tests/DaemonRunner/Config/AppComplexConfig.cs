@@ -13,6 +13,7 @@ namespace NetDaemon.Daemon.Tests.DaemonRunner.Config
         public bool? ABool { get; set; }
         public IEnumerable<string>? AStringList { get; set; }
         public IEnumerable<Device>? Devices { get; set; }
+        
         public override Task InitializeAsync()
         {
             // Do nothing
@@ -21,9 +22,16 @@ namespace NetDaemon.Daemon.Tests.DaemonRunner.Config
         }
     }
 
+    public class Adresses
+    {
+        public string Host { get; set; }
+        public string Ip { get; set; }
+    }
+    
     public class Device
     {
         public string? Name { get; set; }
+        public Adresses Adresses { get; set; }
         public IEnumerable<Command>? Commands { get; set; }
     }
     public class Command
