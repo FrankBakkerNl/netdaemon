@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis.CSharp;
+using NetDaemon.HassModel.CodeGenerator.CodeGeneration;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace NetDaemon.HassModel.CodeGenerator;
@@ -6,16 +7,17 @@ namespace NetDaemon.HassModel.CodeGenerator;
 internal static class Generator
 {
     public static IEnumerable<MemberDeclarationSyntax> GenerateTypes(
-        IReadOnlyCollection<EntityDomainMetadata> domains,
-        IReadOnlyCollection<HassServiceDomain> services)
+        IReadOnlyCollection<EntityDomainMetadata> entityDomains,
+        IReadOnlyCollection<HassServiceDomain> serviceDomains)
     {
-        var orderedServiceDomains = services.OrderBy(x => x.Domain).ToArray();
+        var orderedServiceDomains = serviceDomains.Where(d => d.Services?.Any() ?? false).OrderBy(x => x.Domain).ToArray();
 
-        var entityClasses = EntitiesGenerator.Generate(domains);
+        var helpers = HelpersGenerator.Generate(entityDomains, orderedServiceDomains);
+        var entityClasses = EntitiesGenerator.Generate(entityDomains);
         var serviceClasses = ServicesGenerator.Generate(orderedServiceDomains);
-        var extensionMethodClasses = ExtensionMethodsGenerator.Generate(orderedServiceDomains, domains);
+        var extensionMethodClasses = ExtensionMethodsGenerator.Generate(orderedServiceDomains, entityDomains);
 
-        return new[] { entityClasses, serviceClasses, extensionMethodClasses }.SelectMany(x => x).ToList();
+        return new[] {helpers, entityClasses, serviceClasses, extensionMethodClasses }.SelectMany(x => x).ToList();
     }
 
     public static CompilationUnitSyntax BuildCompilationUnit(string namespaceName, params MemberDeclarationSyntax[] generatedTypes)
