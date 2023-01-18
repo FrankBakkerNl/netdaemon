@@ -37,7 +37,7 @@ public class EnumerableEntityExtensionsTest
     [Fact]
     public void TestTypedStateChanges()
     {
-        var observerMock = new Mock<IObserver<StateChange>>();
+        var observerMock = new Mock<IObserver<StateChange<TestEntity, TestEntityAttributes>>>();
 
         Subject<StateChange> stateChangesSubject = new();
         var haMock = new Mock<IHaContext>();
@@ -54,12 +54,14 @@ public class EnumerableEntityExtensionsTest
             new EntityState { State = "State", AttributesJson = new { name = "Do" }.AsJsonElement() }
         ));
 
-        observerMock.Verify(m => m.OnNext(It.Is<StateChange>(s => s.Entity == switch1 && s.New!.State == "State")), Times.Once);
+        var arg = observerMock.Invocations.First().Arguments.First();
+        
+        observerMock.Verify(m => m.OnNext(It.Is<StateChange<TestEntity, TestEntityAttributes>>(s => s.Entity == switch1 && s.New!.State == "State")), Times.Once);
         observerMock.VerifyNoOtherCalls();
 
         stateChangesSubject.OnNext(new StateChange(switch2, new EntityState { State = "OldState2" }, new EntityState { State = "NewState2" }));
 
-        observerMock.Verify(m => m.OnNext(It.IsAny<StateChange>()), Times.Once);
+        observerMock.Verify(m => m.OnNext(It.IsAny<StateChange<TestEntity, TestEntityAttributes>>()), Times.Once);
     }
 
     [Fact]

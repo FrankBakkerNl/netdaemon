@@ -10,14 +10,14 @@ public static class EntityExtensions
     /// </summary>
     /// <param name="entityState">The state to check</param>
     /// <returns>true if the state equals "on", otherwise false</returns>
-    public static bool IsOn(this EntityState? entityState) => string.Equals(entityState?.State, "on", StringComparison.OrdinalIgnoreCase);
+    public static bool IsOn(this IEntityState<object>? entityState) => string.Equals(entityState?.State, "on", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
     /// Checks if en EntityState has the state "off" 
     /// </summary>
     /// <param name="entityState">The state to check</param>
     /// <returns>true if the state equals "off", otherwise false</returns>
-    public static bool IsOff(this EntityState? entityState) => string.Equals(entityState?.State, "off", StringComparison.OrdinalIgnoreCase);
+    public static bool IsOff(this IEntityState<object>? entityState) => string.Equals(entityState?.State, "off", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
     /// Checks if en Entity has the state "on" 
@@ -35,25 +35,34 @@ public static class EntityExtensions
 
     /// <summary>Gets a NumericEntity from a given Entity</summary>
     public static NumericEntity AsNumeric(this Entity entity) => new(entity);
-
+    
     /// <summary>Gets a NumericEntity from a given Entity</summary>
     public static NumericEntity<TAttributes> 
-        AsNumeric<TEntity, TEntityState, TAttributes>(this Entity<TEntity, TEntityState, TAttributes> entity)
-        where TEntity : Entity<TEntity, TEntityState, TAttributes>
-        where TEntityState : EntityState<TAttributes>
+        AsNumeric<TAttributes>(this Entity<TAttributes> entity)
         where TAttributes : class
         => new(entity);
 
     /// <summary>Gets a new Entity from this Entity with the specified type of attributes</summary>
-    public static Entity<TAttributes> WithAttributesAs<TAttributes>(this Entity entity)
-        where TAttributes : class
-        => new(entity);
+    public static Entity<TNewAttributes> WithAttributesAs<TNewAttributes>(this IEntityCore entity)
+        where TNewAttributes : class
+        => new Entity<TNewAttributes>(entity);
 
     /// <summary>Gets a new Entity from this Entity with the specified type of attributes</summary>
     public static NumericEntity<TAttributes> WithAttributesAs<TAttributes>(this NumericEntity entity)
         where TAttributes : class
         => new (entity);
 
-    internal static IObservable<T> StateChangesOnly<T>(this IObservable<T> changes) where T : StateChange
+    internal static IObservable<IStateChange<TEntity, TAttributes>> StateChangesOnly<TEntity, TAttributes>
+        (this IObservable<IStateChange<TEntity, TAttributes>> changes) 
+        where TEntity : IEntity<TEntity, TAttributes>
+        where TAttributes : class
         => changes.Where(c => c.New?.State != c.Old?.State);
+    
+    
+    internal static IObservable<StateChange<TEntity, TAttributes>> StateChangesOnly<TEntity, TAttributes>
+        (this IObservable<StateChange<TEntity, TAttributes>> changes) 
+        where TEntity : IEntity<TEntity, TAttributes>
+        where TAttributes : class
+        => changes.Where(c => c.New?.State != c.Old?.State);
+    
 }

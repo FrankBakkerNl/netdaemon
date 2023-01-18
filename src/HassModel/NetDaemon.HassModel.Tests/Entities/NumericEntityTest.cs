@@ -117,18 +117,18 @@ public class NumericEntityTest
             @new: new EntityState { State = "2" }));
 
         // Assert
-        stateChangeObserverMock.Verify(o => o.OnNext(It.Is<NumericStateChange>
+        stateChangeObserverMock.Verify(o => o.OnNext(It.Is<NumericStateChange<NumericEntity, object>>
         (e => e.Entity.State.Equals(3.14) &&
               e.Old!.State.Equals(1.0) &&
               e.New!.State.Equals(2.0))), Times.Once);
         stateChangeObserverMock.VerifyNoOtherCalls();
 
-        stateAllChangeObserverMock.Verify(o => o.OnNext(It.Is<NumericStateChange>
+        stateAllChangeObserverMock.Verify(o => o.OnNext(It.Is<NumericStateChange<NumericEntity, object>>
         (e => e.Entity.State.Equals(3.14) &&
               e.Old!.State.Equals(1.0) &&
               e.New!.State.Equals(2.0))), Times.Once);
 
-        stateAllChangeObserverMock.Verify(o => o.OnNext(It.Is<NumericStateChange>
+        stateAllChangeObserverMock.Verify(o => o.OnNext(It.Is<NumericStateChange<NumericEntity, object>>
         (e => e.Entity.State.Equals(3.14) &&
               e.Old!.State.Equals(1.0) &&
               e.New!.State.Equals(1.0))), Times.Once);
@@ -159,18 +159,18 @@ public class NumericEntityTest
             @new: new EntityState { State = "2" }));
 
         // Assert
-        stateChangeObserverMock.Verify(o => o.OnNext(It.Is<NumericStateChange<NumericTestEntity, NumericEntityState<TestEntityAttributes>>>
+        stateChangeObserverMock.Verify(o => o.OnNext(It.Is<NumericStateChange<NumericTestEntity, TestEntityAttributes>>
         (e => e.Entity.State.Equals(3.14) &&
               e.Old!.State.Equals(1.0) &&
               e.New!.State.Equals(2.0))), Times.Once);
         stateChangeObserverMock.VerifyNoOtherCalls();
 
-        stateAllChangeObserverMock.Verify(o => o.OnNext(It.Is<NumericStateChange<NumericTestEntity, NumericEntityState<TestEntityAttributes>>>
+        stateAllChangeObserverMock.Verify(o => o.OnNext(It.Is<NumericStateChange<NumericTestEntity, TestEntityAttributes>>
         (e => e.Entity.State.Equals(3.14) &&
               e.Old!.State.Equals(1.0) &&
               e.New!.State.Equals(2.0))), Times.Once);
 
-        stateAllChangeObserverMock.Verify(o => o.OnNext(It.Is<NumericStateChange<NumericTestEntity, NumericEntityState<TestEntityAttributes>>>
+        stateAllChangeObserverMock.Verify(o => o.OnNext(It.Is<NumericStateChange<NumericTestEntity, TestEntityAttributes>>
         (e => e.Entity.State.Equals(3.14) &&
               e.Old!.State.Equals(1.0) &&
               e.New!.State.Equals(1.0))), Times.Once);

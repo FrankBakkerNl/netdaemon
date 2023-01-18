@@ -3,8 +3,21 @@
 /// <summary>
 /// Detailed state information
 /// </summary>
-public record EntityState
+public record EntityState : IEntityState<object>
 {
+    public EntityState()
+    { }
+    
+    public EntityState(IEntityState<object> source)
+    {
+        EntityId = source.EntityId;
+        State = source.State;
+        AttributesJson = source.AttributesJson;
+        LastChanged = source.LastChanged;
+        LastUpdated = source.LastUpdated;
+        Context = source.Context;
+    }
+    
     /// <summary>Unique id of the entity</summary>
     public string EntityId { get; init; } = "";
     
@@ -28,15 +41,13 @@ public record EntityState
     /// <summary>Context</summary>
     public Context? Context { get; init; }
         
-    internal static TEntityState? Map<TEntityState>(EntityState? state)
-        where TEntityState : class => 
-        state == null ? null : (TEntityState)Activator.CreateInstance(typeof(TEntityState), state)!;    }
-    
+}
+
 /// <summary>
 /// Generic EntityState with specific types of State and Attributes
 /// </summary>
 /// <typeparam name="TAttributes">The type of the Attributes Property</typeparam>
-public record EntityState<TAttributes> : EntityState 
+public record EntityState<TAttributes> : EntityState, IEntityState<TAttributes>
     where TAttributes : class
 {
     private readonly Lazy<TAttributes?> _attributesLazy;
@@ -45,7 +56,7 @@ public record EntityState<TAttributes> : EntityState
     /// Copy constructor from base class
     /// </summary>
     /// <param name="source"></param>
-    public EntityState(EntityState source) : base(source)
+    public EntityState(IEntityState<object> source) : base(source)
     {
         _attributesLazy = new (() => AttributesJson?.Deserialize<TAttributes>() ?? default);            
     }

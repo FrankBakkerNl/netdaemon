@@ -10,11 +10,11 @@ internal static class HassObjectMapper
             Map(source.NewState));
     }
 
-    public static EntityState? Map(this HassState? hassState)
+    public static EntityState<object>? Map(this HassState? hassState)
     {
         if (hassState == null) return null;
 
-        return new EntityState
+        return new EntityState<object>(new EntityState
         {
             EntityId = hassState.EntityId,
             State = hassState.State,
@@ -29,7 +29,7 @@ internal static class HassObjectMapper
                     UserId = hassState.Context.UserId,
                     ParentId = hassState.Context.UserId
                 }
-        };
+        });
     }
 
     public static HassTarget? Map(this ServiceTarget? target)

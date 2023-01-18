@@ -1,8 +1,10 @@
 ﻿namespace NetDaemon.HassModel.Entities;
 
 /// <summary>Represents a Home Assistant entity with its state, changes and services</summary>
-public record Entity
+public record Entity : IEntityCore, IEntity<Entity, object>
 {
+    private IEntityState<object>? _entityState;
+
     /// <summary>
     /// The IHAContext
     /// </summary>
@@ -12,6 +14,8 @@ public record Entity
     /// Entity id being handled by this entity
     /// </summary>
     public string EntityId { get; }
+
+    public Entity(IEntityCore core) : this(core.HaContext, core.EntityId) { }
 
     /// <summary>
     /// Creates a new instance of a Entity class
@@ -28,6 +32,18 @@ public record Entity
     /// Area name of entity
     /// </summary>
     public string? Area => HaContext.GetAreaFromEntityId(EntityId)?.Name;
+
+    IEntityState<object>? IEntity<Entity, object>.EntityState => EntityState;
+
+    IObservable<IStateChange<Entity, object>> IEntity<Entity, object>.StateAllChanges()
+    {
+        throw new NotImplementedException();
+    }
+
+    IObservable<IStateChange<Entity, object>> IEntity<Entity, object>.StateChanges()
+    {
+        throw new NotImplementedException();
+    }
 
     /// <summary>The current state of this Entity</summary>
     public string? State => EntityState?.State;
@@ -52,7 +68,7 @@ public record Entity
     /// Observable, All state changes. New.State!=Old.State
     /// </summary>
     public virtual IObservable<StateChange> StateChanges() =>
-        StateAllChanges().StateChangesOnly();
+        StateAllChanges().Where(e => e.New?.State != e.Old?.State);
 
     /// <summary>
     /// Calls a service using this entity as the target
@@ -72,13 +88,13 @@ public record Entity
 }
 
 /// <summary>Represents a Home Assistant entity with its state, changes and services</summary>
-public abstract record Entity<TEntity, TEntityState, TAttributes> : Entity
-    where TEntity : Entity<TEntity, TEntityState, TAttributes>
+public abstract record Entity<TEntity, TEntityState, TAttributes> : Entity, IEntity<TEntity, TAttributes>
+    where TEntity : IEntity<TEntity, TAttributes>
     where TEntityState : EntityState<TAttributes>
     where TAttributes : class
 {
     /// <summary>Copy constructor from Base type</summary>
-    protected Entity(Entity entity) : base(entity)
+    protected Entity(IEntityCore entity) : base(entity)
     { }
 
     /// <summary>Constructor from haContext and entityId</summary>
@@ -92,17 +108,24 @@ public abstract record Entity<TEntity, TEntityState, TAttributes> : Entity
     public override TEntityState? EntityState => MapState(base.EntityState);
 
     /// <inheritdoc />
-    public override IObservable<StateChange<TEntity, TEntityState>> StateAllChanges() =>
-        base.StateAllChanges().Select(e => new StateChange<TEntity, TEntityState>((TEntity)this, 
-            Entities.EntityState.Map<TEntityState>(e.Old), 
-            Entities.EntityState.Map<TEntityState>(e.New)));
+    public override IObservable<StateChange<TEntity, TAttributes>> StateAllChanges() =>
+        base.StateAllChanges().Select(e => new StateChange<TEntity, TAttributes>((TEntity)(object)this,
+            MapState(e.Old), MapState(e.New)));
 
     /// <inheritdoc />
-    public override IObservable<StateChange<TEntity, TEntityState>> StateChanges() => StateAllChanges().StateChangesOnly();
+    public override IObservable<StateChange<TEntity, TAttributes>> StateChanges() => StateAllChanges().Where(e => e.New?.State != e.Old?.State);
 
-    private static TEntityState? MapState(EntityState? state) => Entities.EntityState.Map<TEntityState>(state);
-}
+    private static TEntityState? MapState(IEntityState<object>? state) => state is null ? null : (TEntityState)new EntityState<TAttributes>(state);
+
+    IEntityState<TAttributes>? IEntity<TEntity, TAttributes>.EntityState => EntityState;
     
+    IObservable<IStateChange<TEntity, TAttributes>> IEntity<TEntity, TAttributes>.StateAllChanges() => StateAllChanges();
+
+    IObservable<IStateChange<TEntity, TAttributes>> IEntity<TEntity, TAttributes>.StateChanges() => StateChanges();
+
+}    
+
+
 /// <summary>Represents a Home Assistant entity with its state, changes and services</summary>
 public record Entity<TAttributes> : Entity<Entity<TAttributes>, EntityState<TAttributes>, TAttributes>
     where TAttributes : class
@@ -110,8 +133,5 @@ public record Entity<TAttributes> : Entity<Entity<TAttributes>, EntityState<TAtt
     // This type is needed because the base type has a recursive type parameter so it can not be used as a return value
         
     /// <summary>Copy constructor from Base type</summary>
-    public Entity(Entity entity) : base(entity) { }
-        
-    /// <summary>Constructor from haContext and entityId</summary>
-    public Entity(IHaContext haContext, string entityId) : base(haContext, entityId) { }
+    public Entity(IEntityCore entity) : base(entity) { }
 }

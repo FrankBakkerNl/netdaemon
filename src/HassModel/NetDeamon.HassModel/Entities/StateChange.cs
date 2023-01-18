@@ -11,7 +11,7 @@ public record StateChange
     /// <param name="entity"></param>
     /// <param name="old"></param>
     /// <param name="new"></param>
-    public StateChange(Entity entity, EntityState? old, EntityState? @new)
+    public StateChange(Entity entity, IEntityState<object>? old, IEntityState<object>? @new)
     {
         Entity = entity;
         New    = @new;
@@ -19,23 +19,25 @@ public record StateChange
     }
 
     /// <summary>The Entity that changed</summary>
-    public virtual Entity Entity { get; } = default!; // Somehow this is needed to avoid a warning about this field being initialized
+    public virtual Entity Entity { get; }
 
     /// <summary>The old state of the entity</summary>
-    public virtual EntityState? Old { get; }
+    public virtual IEntityState<object>? Old { get; }
 
     /// <summary>The new state of the entity</summary>
-    public virtual EntityState? New { get; }
+    public virtual IEntityState<object>? New { get; }
 }
 
 /// <summary>
 /// Represents a state change event for a strong typed entity and state 
 /// </summary>
 /// <typeparam name="TEntity">The Type</typeparam>
-/// <typeparam name="TEntityState"></typeparam>
-public record StateChange<TEntity, TEntityState> : StateChange
-    where TEntity : Entity
-    where TEntityState : EntityState
+/// <typeparam name="TAttributes"></typeparam>
+public record StateChange<TEntity, TAttributes> : StateChange, IStateChange<TEntity, TAttributes> 
+    where TEntity : 
+    //Entity, 
+    IEntity<TEntity, TAttributes>
+    where TAttributes : class
 {
     /// <summary>
     /// This should not be used under normal circumstances but can be used for unit testing of apps
@@ -43,16 +45,18 @@ public record StateChange<TEntity, TEntityState> : StateChange
     /// <param name="entity"></param>
     /// <param name="old"></param>
     /// <param name="new"></param>
-    public StateChange(TEntity entity, TEntityState? old, TEntityState? @new) : base(entity, old, @new)
+    public StateChange(TEntity entity, IEntityState<TAttributes>? old, IEntityState<TAttributes>? @new) : base(new Entity(entity), old, @new)
     {
+        // todo: is a duplicate field really needed here?
+        Entity = entity;
     }
 
     /// <inheritdoc/>
-    public override TEntity Entity => (TEntity)base.Entity;
+    public TEntity Entity { get; }
 
     /// <inheritdoc/>
-    public override TEntityState? New => (TEntityState?)base.New;
+    public override IEntityState<TAttributes>? New => (IEntityState<TAttributes>?)base.New;
 
     /// <inheritdoc/>
-    public override TEntityState? Old => (TEntityState?)base.Old;
+    public override IEntityState<TAttributes>? Old => (IEntityState<TAttributes>?)base.Old;
 }

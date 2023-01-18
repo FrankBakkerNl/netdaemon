@@ -10,32 +10,31 @@ public static class StateObservableExtensions
     /// <summary>
     /// Waits for an EntityState to match a predicate for the specified time
     /// </summary>
-    public static IObservable<StateChange> WhenStateIsFor(
-        this IObservable<StateChange> observable, 
-        Func<EntityState?, bool> predicate,
-        TimeSpan timeSpan,
-        IScheduler? scheduler = null)
-    
-        => observable
-            // Only process changes that start or stop matching the predicate
-            .Where(e => predicate(e.Old) != predicate(e.New))
-                
-            // Both  will restart the timer
-            .Throttle(timeSpan, scheduler ?? Scheduler.Default)
-            
-            // But only when the new state matches the predicate we emit it
-            .Where(e => predicate(e.New));
+    // public static IObservable<StateChange> WhenStateIsFor(
+    //     this IObservable<StateChange> observable, 
+    //     Func<IEntityState<object>?, bool> predicate,
+    //     TimeSpan timeSpan,
+    //     IScheduler? scheduler = null)
+    //
+    //     => observable
+    //         // Only process changes that start or stop matching the predicate
+    //         .Where(e => predicate(e.Old) != predicate(e.New))
+    //             
+    //         // Both  will restart the timer
+    //         .Throttle(timeSpan, scheduler ?? Scheduler.Default)
+    //         
+    //         // But only when the new state matches the predicate we emit it
+    //         .Where(e => predicate(e.New));
     
     /// <summary>
     /// Waits for an EntityState to match a predicate for the specified time
     /// </summary>
-    public static IObservable<StateChange<TEntity, TEntityState>> WhenStateIsFor<TEntity, TEntityState>(
-        this IObservable<StateChange<TEntity, TEntityState>> observable, 
-        Func<TEntityState?, bool> predicate, 
+    public static IObservable<TStateChange> WhenStateIsFor<TStateChange>(
+        this IObservable<TStateChange> observable, 
+        Func<IEntityState<object>?, bool> predicate,
         TimeSpan timeSpan,
         IScheduler? scheduler = null)
-        where TEntity : Entity
-        where TEntityState : EntityState 
+    where TStateChange : IStateChange<Entity, object>
 
         => observable
             .Where(e => predicate(e.Old) != predicate(e.New))
