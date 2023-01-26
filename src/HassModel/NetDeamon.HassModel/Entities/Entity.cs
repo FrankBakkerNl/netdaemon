@@ -36,14 +36,12 @@ public record Entity : IEntityCore, IEntity<Entity, object>
     IEntityState<object>? IEntity<Entity, object>.EntityState => EntityState;
 
     IObservable<IStateChange<Entity, object>> IEntity<Entity, object>.StateAllChanges()
-    {
-        throw new NotImplementedException();
-    }
+        => StateAllChanges().Select(c => new StateChange<Entity, object>(
+            this, 
+            EntityState<Object>.MapState(c.Old),
+            EntityState<Object>.MapState(c.New)));
 
-    IObservable<IStateChange<Entity, object>> IEntity<Entity, object>.StateChanges()
-    {
-        throw new NotImplementedException();
-    }
+    IObservable<IStateChange<Entity, object>> IEntity<Entity, object>.StateChanges() => StateAllChanges().StateChangesOnlyFilter();
 
     /// <summary>The current state of this Entity</summary>
     public string? State => EntityState?.State;
@@ -56,12 +54,12 @@ public record Entity : IEntityCore, IEntity<Entity, object>
     /// <summary>
     /// The full state of this Entity
     /// </summary>
-    public virtual EntityState? EntityState => HaContext.GetState(EntityId);
+    public EntityState? EntityState => HaContext.GetState(EntityId);
 
     /// <summary>
     /// Observable, All state changes including attributes
     /// </summary>
-    public virtual IObservable<StateChange> StateAllChanges() =>
+    public IObservable<StateChange> StateAllChanges() =>
         HaContext.StateAllChanges().Where(e => e.Entity.EntityId == EntityId);
 
     /// <summary>
@@ -87,9 +85,50 @@ public record Entity : IEntityCore, IEntity<Entity, object>
     }
 }
 
+public abstract record Entity<TEntity, TAttributes> :
+    IEntity<TEntity, TAttributes>
+    where TEntity : class, IEntity<TEntity, TAttributes>
+    where TAttributes : class
+{
+    protected Entity(IEntityCore entity) : base(entity)
+    {
+    }
+
+    protected Entity(IHaContext haContext, string entityId) : base(haContext, entityId)
+    {
+    }
+
+    protected Entity() : base(BASE)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IHaContext HaContext { get; }
+    public string EntityId { get; }
+    public string? Area { get; }
+    public IEntityState<TAttributes>? EntityState { get; }
+    public IObservable<IStateChange<TEntity, TAttributes>> StateAllChanges()
+    {
+        throw new NotImplementedException();
+    }
+
+    public IObservable<IStateChange<TEntity, TAttributes>> StateChanges()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void CallService(string service, object? data = null)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+
+
+
 /// <summary>Represents a Home Assistant entity with its state, changes and services</summary>
 public abstract record Entity<TEntity, TEntityState, TAttributes> : Entity, IEntity<TEntity, TAttributes>
-    where TEntity : IEntity<TEntity, TAttributes>
+    where TEntity : class, IEntity<TEntity, TAttributes>
     where TEntityState : EntityState<TAttributes>
     where TAttributes : class
 {
@@ -105,23 +144,15 @@ public abstract record Entity<TEntity, TEntityState, TAttributes> : Entity, IEnt
     public override TAttributes? Attributes => EntityState?.Attributes;
 
     /// <inheritdoc />
-    public override TEntityState? EntityState => MapState(base.EntityState);
+    public new IEntityState<TAttributes>? EntityState => EntityState<TAttributes>.MapState(base.EntityState);
 
     /// <inheritdoc />
-    public override IObservable<StateChange<TEntity, TAttributes>> StateAllChanges() =>
+    public new IObservable<IStateChange<TEntity, TAttributes>> StateAllChanges() =>
         base.StateAllChanges().Select(e => new StateChange<TEntity, TAttributes>((TEntity)(object)this,
-            MapState(e.Old), MapState(e.New)));
+            EntityState<TAttributes>.MapState(e.Old), EntityState<TAttributes>.MapState(e.New)));
 
     /// <inheritdoc />
-    public override IObservable<StateChange<TEntity, TAttributes>> StateChanges() => StateAllChanges().Where(e => e.New?.State != e.Old?.State);
-
-    private static TEntityState? MapState(IEntityState<object>? state) => state is null ? null : (TEntityState)new EntityState<TAttributes>(state);
-
-    IEntityState<TAttributes>? IEntity<TEntity, TAttributes>.EntityState => EntityState;
-    
-    IObservable<IStateChange<TEntity, TAttributes>> IEntity<TEntity, TAttributes>.StateAllChanges() => StateAllChanges();
-
-    IObservable<IStateChange<TEntity, TAttributes>> IEntity<TEntity, TAttributes>.StateChanges() => StateChanges();
+    public new IObservable<IStateChange<TEntity, TAttributes>> StateChanges() => StateAllChanges().StateChangesOnlyFilter();
 
 }    
 

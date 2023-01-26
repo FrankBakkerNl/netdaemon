@@ -52,17 +52,10 @@ public static class EntityExtensions
         where TAttributes : class
         => new (entity);
 
-    internal static IObservable<IStateChange<TEntity, TAttributes>> StateChangesOnly<TEntity, TAttributes>
-        (this IObservable<IStateChange<TEntity, TAttributes>> changes) 
+    internal static IObservable<IStateChange<TEntity, TAttributes>> StateChangesOnlyFilter<TEntity, TAttributes>(
+        this IObservable<IStateChange<TEntity, TAttributes>> changes)
         where TEntity : IEntity<TEntity, TAttributes>
         where TAttributes : class
         => changes.Where(c => c.New?.State != c.Old?.State);
-    
-    
-    internal static IObservable<StateChange<TEntity, TAttributes>> StateChangesOnly<TEntity, TAttributes>
-        (this IObservable<StateChange<TEntity, TAttributes>> changes) 
-        where TEntity : IEntity<TEntity, TAttributes>
-        where TAttributes : class
-        => changes.Where(c => c.New?.State != c.Old?.State);
-    
+
 }

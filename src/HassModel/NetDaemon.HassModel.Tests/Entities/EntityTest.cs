@@ -58,11 +58,8 @@ public class EntityTest
         haContextMock.Setup(h => h.StateAllChanges()).Returns(stateChangesSubject);
 
         var target = new TestEntity(haContextMock.Object, "domain.testEntity");
-        var stateChangeObserverMock = new Mock<IObserver<StateChange>>();
-        var stateAllChangeObserverMock = new Mock<IObserver<StateChange>>();
-
-        target.StateAllChanges().Subscribe(stateAllChangeObserverMock.Object);
-        target.StateChanges().Subscribe(stateChangeObserverMock.Object);
+        var stateAllChangeObserverMock = target.StateAllChanges().SubscribeMock();
+        var stateChangeObserverMock = target.StateChanges().SubscribeMock();
 
         stateChangesSubject.OnNext(
             new StateChange(target, new EntityState { State = "old" },
@@ -72,8 +69,8 @@ public class EntityTest
             new StateChange(target, new EntityState() { State = "same" },
                 new EntityState { State = "same" }));
 
-        stateChangeObserverMock.Verify(o => o.OnNext(It.IsAny<StateChange>()), Times.Once);
-        stateAllChangeObserverMock.Verify(o => o.OnNext(It.IsAny<StateChange>()), Times.Exactly(2));
+        stateChangeObserverMock.Verify(o => o.OnNext(It.IsAny<IStateChange<TestEntity, TestEntityAttributes>>()), Times.Once);
+        stateAllChangeObserverMock.Verify(o => o.OnNext(It.IsAny<IStateChange<TestEntity, TestEntityAttributes>>()), Times.Exactly(2));
     }
 
     [Fact]

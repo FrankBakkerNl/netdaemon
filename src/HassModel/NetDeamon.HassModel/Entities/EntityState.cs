@@ -52,6 +52,9 @@ public record EntityState<TAttributes> : EntityState, IEntityState<TAttributes>
 {
     private readonly Lazy<TAttributes?> _attributesLazy;
 
+    internal static EntityState<TAttributes>? MapState(IEntityState<object>? state) => state is null ? null : new EntityState<TAttributes>(state);
+
+    
     /// <summary>
     /// Copy constructor from base class
     /// </summary>

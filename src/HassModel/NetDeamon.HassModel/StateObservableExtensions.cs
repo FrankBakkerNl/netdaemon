@@ -29,12 +29,13 @@ public static class StateObservableExtensions
     /// <summary>
     /// Waits for an EntityState to match a predicate for the specified time
     /// </summary>
-    public static IObservable<TStateChange> WhenStateIsFor<TStateChange>(
-        this IObservable<TStateChange> observable, 
+    public static IObservable<IStateChange<TEntity, TAttributes>> WhenStateIsFor<TEntity, TAttributes>(
+        this IObservable<IStateChange<TEntity, TAttributes>> observable, 
         Func<IEntityState<object>?, bool> predicate,
         TimeSpan timeSpan,
         IScheduler? scheduler = null)
-    where TStateChange : IStateChange<Entity, object>
+    where TEntity : IEntity<TEntity, TAttributes>
+    where TAttributes : class
 
         => observable
             .Where(e => predicate(e.Old) != predicate(e.New))

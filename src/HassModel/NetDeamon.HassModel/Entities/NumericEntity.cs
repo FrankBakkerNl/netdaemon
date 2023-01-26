@@ -15,15 +15,15 @@ public record NumericEntity : Entity, IEntity<NumericEntity, object>
     public new double? State => EntityState?.State;
 
     /// <inheritdoc/>
-    public override NumericEntityState? EntityState => base.EntityState == null ? null : new (base.EntityState);
+    public new NumericEntityState? EntityState => base.EntityState == null ? null : new (base.EntityState);
         
     /// <inheritdoc/>
-    public override IObservable<NumericStateChange<NumericEntity, object> > StateAllChanges() => 
+    public new IObservable<NumericStateChange<NumericEntity, object> > StateAllChanges() => 
         base.StateAllChanges().Select(e => new NumericStateChange<NumericEntity, object>(this, 
                 MapState(e.Old), MapState(e.New)));
         
     /// <inheritdoc/>
-    public override IObservable<NumericStateChange<NumericEntity, object>> StateChanges() => StateAllChanges().Where(e => e.Old?.State != e.New?.State);
+    public new IObservable<NumericStateChange<NumericEntity, object>> StateChanges() => StateAllChanges().Where(e => e.Old?.State != e.New?.State);
     
     private static EntityState<Object>? MapState(IEntityState<object>? state) => state is null ? null : new EntityState<object>(state);
 
@@ -69,14 +69,13 @@ public record NumericEntity<TEntity, TAttributes> :
         
     /// <summary>The full state of this Entity</summary>
     public new NumericEntityState<TAttributes>? EntityState => base.EntityState == null ? null : new (base.EntityState);
-    // we need a new here because EntityState is not covariant for TAttributes
 
     /// <inheritdoc/>
-    public override IObservable<NumericStateChange<TEntity, TAttributes>> StateAllChanges() => 
+    public new IObservable<NumericStateChange<TEntity, TAttributes>> StateAllChanges() => 
         base.StateAllChanges().Select(e => new NumericStateChange<TEntity, TAttributes>((TEntity)this, e.Old, e.New));
 
     /// <inheritdoc/>
-    public override IObservable<NumericStateChange<TEntity, TAttributes>> StateChanges() =>
+    public new IObservable<NumericStateChange<TEntity, TAttributes>> StateChanges() =>
         StateAllChanges().Where(e => e.New?.State != e.Old?.State);
 }
     
