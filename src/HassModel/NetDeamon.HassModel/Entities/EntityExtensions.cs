@@ -54,7 +54,7 @@ public static class EntityExtensions
 
     internal static IObservable<IStateChange<TEntity, TAttributes>> StateChangesOnlyFilter<TEntity, TAttributes>(
         this IObservable<IStateChange<TEntity, TAttributes>> changes)
-        where TEntity : IEntity<TEntity, TAttributes>
+        where TEntity : class, IEntity<TEntity, TAttributes>
         where TAttributes : class
         => changes.Where(c => c.New?.State != c.Old?.State);
 

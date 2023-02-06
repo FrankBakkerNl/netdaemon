@@ -42,7 +42,7 @@ public record NumericStateChange : StateChange<NumericEntity, object>
 /// Represents a state change event for a strong typed entity and state 
 /// </summary>
 public record NumericStateChange<TEntity, TAttributes> : StateChange<TEntity, TAttributes> 
-    where TEntity : IEntity<TEntity, TAttributes>
+    where TEntity : class, IEntity<TEntity, TAttributes>
     where TAttributes : class
 {
     internal NumericStateChange(TEntity entity, IEntityState<TAttributes>? old, IEntityState<TAttributes>? @new) : base(entity, old, @new)

@@ -9,28 +9,21 @@ public record TestEntity : Entity<TestEntity, TestEntityAttributes>, IEntity<Tes
 }
 
 
-public record TestEntity2: 
-     Entity<TestEntity2, object>,
-     IEntity<TestEntity2, TestEntityAttributes>
+public record TestEntity2 : Entity<TestEntity2, TestEntityAttributes>
 {
     
-    public IHaContext HaContext { get; }
-    public string EntityId { get; }
-    public string? Area { get; }
-    public IEntityState<TestEntityAttributes>? EntityState { get; }
-    public IObservable<IStateChange<TestEntity, TestEntityAttributes>> StateAllChanges()
-    {
-        throw new NotImplementedException();
-    }
-
-    public IObservable<IStateChange<TestEntity, TestEntityAttributes>> StateChanges()
-    {
-        throw new NotImplementedException();
-    }
 
     public void CallService(string service, object? data = null)
     {
         throw new NotImplementedException();
+    }
+
+    public TestEntity2(IEntityCore entity) : base(entity)
+    {
+    }
+
+    public TestEntity2(IHaContext haContext, string entityId) : base(haContext, entityId)
+    {
     }
 }
 

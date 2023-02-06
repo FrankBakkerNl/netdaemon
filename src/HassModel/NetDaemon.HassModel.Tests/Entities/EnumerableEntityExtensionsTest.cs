@@ -46,20 +46,20 @@ public class EnumerableEntityExtensionsTest
 
         // Act: Subscribe to both entities, filter on attribute
         // TODO: remove type arguments here
-        var testEntities = new[] { switch1, switch2 };
-        var observerMock = EnumerableEntityExtensions.StateAllChanges(testEntities).Where(e => e.New?.Attributes?.Name == "Do").SubscribeMock();
+        var testEntities = new IEntity<TestEntity2, TestEntityAttributes>[] { switch1, switch2 };
+        var observerMock = testEntities.StateAllChanges().Where(e => e.New?.Attributes?.Name == "Do").SubscribeMock();
         
         stateChangesSubject.OnNext(new StateChange(switch1,
             new EntityState { State = "State", AttributesJson = new { name = "John" }.AsJsonElement() },
             new EntityState { State = "State", AttributesJson = new { name = "Do" }.AsJsonElement() }
         ));
 
-        observerMock.Verify(m => m.OnNext(It.Is<StateChange<TestEntity, TestEntityAttributes>>(s => s.Entity == switch1 && s.New!.State == "State")), Times.Once);
+        observerMock.Verify(m => m.OnNext(It.Is<StateChange<TestEntity2, TestEntityAttributes>>(s => s.Entity == switch1 && s.New!.State == "State")), Times.Once);
         observerMock.VerifyNoOtherCalls();
 
         stateChangesSubject.OnNext(new StateChange(switch2, new EntityState { State = "OldState2" }, new EntityState { State = "NewState2" }));
 
-        observerMock.Verify(m => m.OnNext(It.IsAny<StateChange<TestEntity, TestEntityAttributes>>()), Times.Once);
+        observerMock.Verify(m => m.OnNext(It.IsAny<StateChange<TestEntity2, TestEntityAttributes>>()), Times.Once);
     }
 
     [Fact]

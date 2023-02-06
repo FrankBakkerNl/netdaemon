@@ -34,7 +34,7 @@ public static class StateObservableExtensions
         Func<IEntityState<object>?, bool> predicate,
         TimeSpan timeSpan,
         IScheduler? scheduler = null)
-    where TEntity : IEntity<TEntity, TAttributes>
+    where TEntity : class, IEntity<TEntity, TAttributes>
     where TAttributes : class
 
         => observable

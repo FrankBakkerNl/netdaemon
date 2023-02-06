@@ -26,6 +26,14 @@ public interface IEntity<out TEntity, out TAttributes>
     /// <inheritdoc />
     IEntityState<TAttributes>? EntityState { get; }
 
+    /// <summary>The current state of this Entity</summary>
+    string? State { get; }
+
+    /// <summary>
+    /// The current Attributes of this Entity
+    /// </summary>
+    object? Attributes { get; }
+
     /// <inheritdoc />
     IObservable<IStateChange<TEntity, TAttributes>> StateAllChanges();
 

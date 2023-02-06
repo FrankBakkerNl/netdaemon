@@ -23,9 +23,15 @@ public record StateChange : StateChange<Entity, object>
 /// <typeparam name="TEntity">The Type</typeparam>
 /// <typeparam name="TAttributes"></typeparam>
 public record StateChange<TEntity, TAttributes> : IStateChange<TEntity, TAttributes> 
-    where TEntity : IEntity<TEntity, TAttributes>
+    where TEntity : class, IEntity<TEntity, TAttributes>
     where TAttributes : class
 {
+    public StateChange(TEntity entity, IEntityState<object>? old, IEntityState<object>? @new) :
+        this(entity, EntityState<TAttributes>.MapState(old), EntityState<TAttributes>.MapState(@new))
+    {
+    }
+
+
     /// <summary>
     /// This should not be used under normal circumstances but can be used for unit testing of apps
     /// </summary>
