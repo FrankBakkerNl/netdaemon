@@ -10,3 +10,13 @@ public interface IStateChange<out TEntity, out TAttributes>
 
     IEntityState<TAttributes>? Old { get; }
 }
+
+public interface INumericStateChange<out TEntity, out TAttributes> : IStateChange<TEntity, TAttributes>
+    where TEntity : class, IEntity<TEntity, TAttributes>
+    where TAttributes : class
+{
+    INumericEntityState<TAttributes>? New { get; }
+
+    INumericEntityState<TAttributes>? Old { get; }
+    
+}

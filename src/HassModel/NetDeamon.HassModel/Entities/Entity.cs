@@ -1,10 +1,8 @@
 ﻿namespace NetDaemon.HassModel.Entities;
 
 /// <summary>Represents a Home Assistant entity with its state, changes and services</summary>
-public record Entity : IEntityCore, IEntity<Entity, object>
+public record Entity : IEntity<Entity, object>
 {
-    private IEntityState<object>? _entityState;
-
     /// <summary>
     /// The IHAContext
     /// </summary>
@@ -33,16 +31,6 @@ public record Entity : IEntityCore, IEntity<Entity, object>
     /// </summary>
     public string? Area => HaContext.GetAreaFromEntityId(EntityId)?.Name;
 
-    //IEntityState<object>? IEntity<Entity, object>.EntityState => EntityState;
-    //
-    // IObservable<IStateChange<Entity, object>> IEntity<Entity, object>.StateAllChanges()
-    //     => StateAllChanges().Select(c => new StateChange<Entity, object>(
-    //         this, 
-    //         EntityState<Object>.MapState(c.Old),
-    //         EntityState<Object>.MapState(c.New)));
-    //
-    // IObservable<IStateChange<Entity, object>> IEntity<Entity, object>.StateChanges() => StateAllChanges().StateChangesOnlyFilter();
-
     /// <summary>The current state of this Entity</summary>
     public string? State => EntityState?.State;
 
@@ -60,13 +48,13 @@ public record Entity : IEntityCore, IEntity<Entity, object>
     /// Observable, All state changes including attributes
     /// </summary>
     public virtual IObservable<IStateChange<Entity, object>> StateAllChanges() =>
-        HaContext.StateAllChanges().Where(e => e.Entity.EntityId == EntityId);
+        HaContext.StateAllChanges().Where(e => e.Entity.EntityId == EntityId).Select(e => new StateChange<Entity, object>(this, e.Old,e.New));
 
     /// <summary>
     /// Observable, All state changes. New.State!=Old.State
     /// </summary>
     public virtual IObservable<IStateChange<Entity, object>> StateChanges() =>
-        StateAllChanges().Where(e => e.New?.State != e.Old?.State);
+        StateAllChanges().StateChangesOnlyFilter();
 
     /// <summary>
     /// Calls a service using this entity as the target
@@ -85,18 +73,17 @@ public record Entity : IEntityCore, IEntity<Entity, object>
     }
 }
 
+/// <summary>Represents a Home Assistant entity with its state, changes and services</summary>
 public abstract record Entity<TEntity, TAttributes> : Entity,
     IEntity<TEntity, TAttributes>
     where TEntity : class, IEntity<TEntity, TAttributes>
     where TAttributes : class
 {
     protected Entity(IEntityCore entity) : this(entity.HaContext, entity.EntityId)
-    {
-    }
+    { }
 
     protected Entity(IHaContext haContext, string entityId) : base(haContext, entityId)
-    {
-    }
+    { }
 
     public override IEntityState<TAttributes>? EntityState => new EntityState<TAttributes>(base.EntityState);
     public override TAttributes? Attributes { get; }
@@ -147,4 +134,7 @@ public record Entity<TAttributes> : Entity<Entity<TAttributes>, EntityState<TAtt
         
     /// <summary>Copy constructor from Base type</summary>
     public Entity(IEntityCore entity) : base(entity) { }
+    
+    /// <summary>Constructor from haContext and entityId</summary>
+    public Entity(IHaContext haContext, string entityId) : base(haContext, entityId) { }
 }

@@ -3,7 +3,7 @@
 /// <summary>
 /// Entity that has a numeric (double) State value
 /// </summary>
-public record NumericEntity : Entity, IEntity<NumericEntity, object>
+public record NumericEntity : Entity//, Entity<NumericEntity, object>
 {
     /// <summary>Copy constructor from base class</summary>
     public NumericEntity(IEntityCore entity) : base(entity) { }
@@ -18,17 +18,17 @@ public record NumericEntity : Entity, IEntity<NumericEntity, object>
     public new NumericEntityState? EntityState => base.EntityState == null ? null : new (base.EntityState);
         
     /// <inheritdoc/>
-    public new IObservable<NumericStateChange<NumericEntity, object> > StateAllChanges() => 
-        base.StateAllChanges().Select(e => new NumericStateChange<NumericEntity, object>(this, 
+    public new IObservable<IStateChange<NumericEntity, object> > StateAllChanges() => 
+        base.StateAllChanges().Select(e => new StateChange<NumericEntity, object>(this, 
                 MapState(e.Old), MapState(e.New)));
         
     /// <inheritdoc/>
-    public new IObservable<NumericStateChange<NumericEntity, object>> StateChanges() => StateAllChanges().Where(e => e.Old?.State != e.New?.State);
+    public new IObservable<StateChange<NumericEntity, object>> StateChanges() => StateAllChanges().Where(e => e.Old?.State != e.New?.State);
     
     private static EntityState<Object>? MapState(IEntityState<object>? state) => state is null ? null : new EntityState<object>(state);
 
     
-    IEntityState<object>? IEntity<NumericEntity, object>.EntityState => EntityState;
+    INumericEntityState<object>? IEntity<NumericEntity, object>.EntityState => EntityState;
 
     IObservable<IStateChange<NumericEntity, object>> IEntity<NumericEntity, object>.StateAllChanges() => StateAllChanges();
 
@@ -71,11 +71,11 @@ public record NumericEntity<TEntity, TAttributes> :
     public new NumericEntityState<TAttributes>? EntityState => base.EntityState == null ? null : new (base.EntityState);
 
     /// <inheritdoc/>
-    public new IObservable<NumericStateChange<TEntity, TAttributes>> StateAllChanges() => 
-        base.StateAllChanges().Select(e => new NumericStateChange<TEntity, TAttributes>((TEntity)this, e.Old, e.New));
+    public new IObservable<StateChange<TEntity, TAttributes>> StateAllChanges() => 
+        base.StateAllChanges().Select(e => new StateChange<TEntity, TAttributes>((TEntity)this, e.Old, e.New));
 
     /// <inheritdoc/>
-    public new IObservable<NumericStateChange<TEntity, TAttributes>> StateChanges() =>
+    public new IObservable<StateChange<TEntity, TAttributes>> StateChanges() =>
         StateAllChanges().Where(e => e.New?.State != e.Old?.State);
 }
     

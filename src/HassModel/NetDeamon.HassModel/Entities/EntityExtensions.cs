@@ -43,9 +43,9 @@ public static class EntityExtensions
         => new(entity);
 
     /// <summary>Gets a new Entity from this Entity with the specified type of attributes</summary>
-    public static Entity<TNewAttributes> WithAttributesAs<TNewAttributes>(this IEntityCore entity)
-        where TNewAttributes : class
-        => new Entity<TNewAttributes>(entity);
+    public static Entity<TAttributes> WithAttributesAs<TAttributes>(this IEntityCore entity)
+        where TAttributes : class
+        => new (entity);
 
     /// <summary>Gets a new Entity from this Entity with the specified type of attributes</summary>
     public static NumericEntity<TAttributes> WithAttributesAs<TAttributes>(this NumericEntity entity)

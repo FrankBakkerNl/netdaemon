@@ -24,3 +24,11 @@ public interface IEntityState<out TAttributes> : IEntityStateCore
     /// <summary>Context</summary>
     Context? Context { get; }
 }
+
+public interface INumericEntityState<out TAttributes> : IEntityState<TAttributes>
+    where TAttributes : class
+{
+
+    /// <summary>The state </summary>
+    double? State { get; }
+}

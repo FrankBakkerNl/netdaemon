@@ -3,7 +3,7 @@
 /// <summary>
 /// Represents a state change event for an entity
 /// </summary>
-public record StateChange : StateChange<Entity, object> 
+public record StateChange 
 {
     /// <summary>
     /// This should not be used under normal circumstances but can be used for unit testing of apps
@@ -11,11 +11,22 @@ public record StateChange : StateChange<Entity, object>
     /// <param name="entity"></param>
     /// <param name="old"></param>
     /// <param name="new"></param>
-    public StateChange(Entity entity, IEntityState<object>? old, IEntityState<object>? @new) : base(entity, old, @new)
+    public StateChange(Entity entity, IEntityState<object>? old, IEntityState<object>? @new)
     {
-
+        Entity = entity;
+        New    = @new;
+        Old    = old;
     }
+    /// <summary>The Entity that changed</summary>
+    public virtual Entity Entity { get; } 
+
+    /// <summary>The old state of the entity</summary>
+    public virtual IEntityState<object>? Old { get; }
+
+    /// <summary>The new state of the entity</summary>
+    public virtual IEntityState<object>? New { get; }
 }
+
 
 /// <summary>
 /// Represents a state change event for a strong typed entity and state 
@@ -31,7 +42,6 @@ public record StateChange<TEntity, TAttributes> : IStateChange<TEntity, TAttribu
     {
     }
 
-
     /// <summary>
     /// This should not be used under normal circumstances but can be used for unit testing of apps
     /// </summary>
@@ -46,13 +56,11 @@ public record StateChange<TEntity, TAttributes> : IStateChange<TEntity, TAttribu
     }
 
     /// <inheritdoc/>
-    public virtual TEntity Entity { get; }
+    public TEntity Entity { get; }
 
     /// <inheritdoc/>
-    public virtual IEntityState<TAttributes>? New { get; }
-
+    public IEntityState<TAttributes>? New { get; }
 
     /// <inheritdoc/>
-    public virtual IEntityState<TAttributes>? Old { get; }
-
+    public IEntityState<TAttributes>? Old { get; }
 }
