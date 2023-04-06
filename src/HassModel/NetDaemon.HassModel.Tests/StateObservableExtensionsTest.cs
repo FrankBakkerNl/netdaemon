@@ -11,13 +11,15 @@ public class StateObservableExtensionsTest
     private readonly Subject<IStateChange<Entity, object>> _subject = new();
     
     private readonly TestScheduler _testScheduler = new();
-    private readonly IObservable<IStateChange<NumericEntity, object>> _numericStateChangeObservable;
+    private readonly IObservable<INumericStateChange<NumericEntity, object>> _numericStateChangeObservable;
 
     public StateObservableExtensionsTest()
     {
-        _numericStateChangeObservable = _subject.Select(e => new StateChange<NumericEntity, object>(new NumericEntity(e.Entity),
-                                                                    new NumericEntityState(e.Old),
-                                                                    new NumericEntityState(e.New)));
+        _numericStateChangeObservable = _subject
+            .Select(e => new NumericStateChange<NumericEntity, object>(new NumericEntity(e.Entity), e.Old, e.New));
+        // .Select(e => new NumericStateChange(new NumericEntity(e.Entity),
+        // new NumericEntityState(e.Old),
+        // new NumericEntityState(e.New)));
     }
 
     [Fact]
@@ -43,7 +45,6 @@ public class StateObservableExtensionsTest
     [Fact]
     public void WhenNumericStateIsForFiresInTime()
     {
-        _numericStateChangeObservable.Select(e)
         // wait for the sensor to be > 20 for at least 10 ticks
         var eventTimes = _numericStateChangeObservable.WhenStateIsFor(e => e?.State > 20, TimeSpan.FromTicks(10), _testScheduler)
             .Select(_ => _testScheduler.Now.Ticks).SubscribeMock();

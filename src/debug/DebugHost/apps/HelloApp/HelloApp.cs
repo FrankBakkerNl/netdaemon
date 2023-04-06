@@ -8,7 +8,7 @@ using NetDaemon.HassModel;
 namespace Apps;
 
 [NetDaemonApp]
-// [Focus]
+[Focus]
 public sealed class HelloApp : IAsyncDisposable
 {
     private readonly ILogger<HelloApp> _logger;

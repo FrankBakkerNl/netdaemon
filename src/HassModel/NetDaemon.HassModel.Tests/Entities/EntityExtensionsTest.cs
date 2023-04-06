@@ -1,4 +1,4 @@
-﻿using NetDaemon.HassModel.Entities;
+﻿ using NetDaemon.HassModel.Entities;
 
 namespace NetDaemon.HassModel.Tests.Entities;
 
@@ -28,6 +28,8 @@ public class EntityExtensionsTest
     {
         GetEntityWitState(state).IsOff().Should().Be(isOn);
         GetEntityWitState(state).EntityState.IsOff().Should().Be(isOn);
+
+        var x = GetEntityWitState(state).StateAsDouble() > 0.1f;
     }
         
     private Entity GetEntityWitState(string? state)

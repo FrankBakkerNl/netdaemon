@@ -34,6 +34,16 @@ public record Entity : IEntity<Entity, object>
     /// <summary>The current state of this Entity</summary>
     public string? State => EntityState?.State;
 
+    
+    // Implement these explicit to avoid cluttering 
+    JsonElement? IEntityState.AttributesJson => EntityState?.AttributesJson;
+
+    DateTime? IEntityState.LastChanged => EntityState?.LastChanged;
+
+    DateTime? IEntityState.LastUpdated => EntityState?.LastUpdated;
+
+    Context? IEntityState.Context => EntityState?.Context;
+
     /// <summary>
     /// The current Attributes of this Entity
     /// </summary>
@@ -86,7 +96,7 @@ public abstract record Entity<TEntity, TAttributes> : Entity,
     { }
 
     public override IEntityState<TAttributes>? EntityState => new EntityState<TAttributes>(base.EntityState);
-    public override TAttributes? Attributes { get; }
+    public override TAttributes? Attributes => EntityState?.Attributes;
 
     public new IObservable<IStateChange<TEntity, TAttributes>> StateAllChanges()
         => base.StateAllChanges().Select(e => new StateChange<TEntity, TAttributes>((TEntity)(object)this, e.Old,e.New));

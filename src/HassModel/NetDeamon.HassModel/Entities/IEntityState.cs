@@ -1,11 +1,8 @@
 namespace NetDaemon.HassModel.Entities;
 
-public interface IEntityState<out TAttributes> : IEntityStateCore
-    where TAttributes : class
+
+public interface IEntityState
 {
-    /// <inheritdoc/>
-    TAttributes? Attributes { get; }
-    
     /// <summary>Unique id of the entity</summary>
     string EntityId { get; }
 
@@ -25,10 +22,17 @@ public interface IEntityState<out TAttributes> : IEntityStateCore
     Context? Context { get; }
 }
 
+public interface IEntityState<out TAttributes> : IEntityState
+    where TAttributes : class
+{
+    /// <inheritdoc/>
+    TAttributes? Attributes { get; }
+}
+
 public interface INumericEntityState<out TAttributes> : IEntityState<TAttributes>
     where TAttributes : class
 {
 
-    /// <summary>The state </summary>
-    double? State { get; }
+    /// <summary>The state as a double</summary>
+    new double? State { get; }
 }

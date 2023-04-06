@@ -14,7 +14,7 @@ public interface IEntityCore
 }
 
 public interface IEntity<out TEntity, out TAttributes>
-    : IEntityCore//, IEntityState<TAttributes>
+    : IEntityCore, IEntityState<TAttributes>
     where TEntity : class, IEntity<TEntity, TAttributes>
     where TAttributes : class
 {

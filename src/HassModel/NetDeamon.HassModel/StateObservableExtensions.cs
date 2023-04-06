@@ -41,4 +41,22 @@ public static class StateObservableExtensions
             .Where(e => predicate(e.Old) != predicate(e.New))
             .Throttle(timeSpan, scheduler ?? Scheduler.Default)
             .Where(e => predicate(e.New));
+    
+    
+    /// <summary>
+    /// Waits for an EntityState to match a predicate for the specified time
+    /// </summary>
+    public static IObservable<INumericStateChange<TEntity, TAttributes>> WhenStateIsFor<TEntity, TAttributes>(
+        this IObservable<INumericStateChange<TEntity, TAttributes>> observable, 
+        Func<INumericEntityState<object>?, bool> predicate,
+        TimeSpan timeSpan,
+        IScheduler? scheduler = null)
+        where TEntity : class, IEntity<TEntity, TAttributes>
+        where TAttributes : class
+
+        => observable
+            .Where(e => predicate(e.Old) != predicate(e.New))
+            .Throttle(timeSpan, scheduler ?? Scheduler.Default)
+            .Where(e => predicate(e.New));    
+    
 }

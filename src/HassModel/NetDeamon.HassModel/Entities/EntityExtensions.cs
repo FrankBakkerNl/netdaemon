@@ -10,28 +10,16 @@ public static class EntityExtensions
     /// </summary>
     /// <param name="entityState">The state to check</param>
     /// <returns>true if the state equals "on", otherwise false</returns>
-    public static bool IsOn(this IEntityState<object>? entityState) => string.Equals(entityState?.State, "on", StringComparison.OrdinalIgnoreCase);
+    public static bool IsOn(this IEntityState? entityState) => string.Equals(entityState?.State, "on", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
     /// Checks if en EntityState has the state "off" 
     /// </summary>
     /// <param name="entityState">The state to check</param>
     /// <returns>true if the state equals "off", otherwise false</returns>
-    public static bool IsOff(this IEntityState<object>? entityState) => string.Equals(entityState?.State, "off", StringComparison.OrdinalIgnoreCase);
+    public static bool IsOff(this IEntityState? entityState) => string.Equals(entityState?.State, "off", StringComparison.OrdinalIgnoreCase);
 
-    /// <summary>
-    /// Checks if en Entity has the state "on" 
-    /// </summary>
-    /// <param name="entity">The state to check</param>
-    /// <returns>true if the state equals "on", otherwise false</returns>
-    public static bool IsOn(this Entity? entity) => entity?.EntityState?.IsOn() ?? false;
-
-    /// <summary>
-    /// Checks if en Entity has the state "off" 
-    /// </summary>
-    /// <param name="entity">The state to check</param>
-    /// <returns>true if the state equals "off", otherwise false</returns>
-    public static bool IsOff(this Entity? entity) => entity?.EntityState?.IsOff() ?? false;
+    public static double? StateAsDouble(this IEntityState? entityState) => FormatHelpers.ParseAsDouble(entityState?.State); 
 
     /// <summary>Gets a NumericEntity from a given Entity</summary>
     public static NumericEntity AsNumeric(this Entity entity) => new(entity);

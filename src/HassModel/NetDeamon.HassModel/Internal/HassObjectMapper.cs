@@ -34,7 +34,7 @@ internal static class HassObjectMapper
 
     public static HassTarget? Map(this ServiceTarget? target)
     {
-        if (target is null) return null;
+        if (target == null) return null;
 
         return new HassTarget
         {
