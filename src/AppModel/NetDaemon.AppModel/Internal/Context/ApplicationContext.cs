@@ -2,6 +2,15 @@ using NetDaemon.AppModel.Internal.AppFactories;
 
 namespace NetDaemon.AppModel.Internal;
 
+/// <summary>
+/// Maintains a context for a running instance of a users NetDeamonApp along with its ServiceProvider Scope
+/// this ApplicationContext is responsible for
+/// - Creating a new ServiceScope for the new application instance
+/// - Creating a new instance of the users class within that scope
+/// - Calling InitializeAsync() after the instance is loaded
+/// - Disposing the app and its scope.
+///   This also makes sure all dependencies that were created for this app instance are disposed
+/// </summary>
 internal sealed class ApplicationContext
 {
     private readonly CancellationTokenSource _cancelTokenSource = new();
@@ -34,7 +43,7 @@ internal sealed class ApplicationContext
 
     public async ValueTask DisposeAsync()
     {
-        // prevent multiple Disposes because the Service Scope will also dispose this  
+        // prevent multiple Disposes because the Service Scope will also dispose this
         if (_isDisposed) return;
 
         _isDisposed = true;

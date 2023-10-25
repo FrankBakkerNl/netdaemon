@@ -2,6 +2,9 @@ using NetDaemon.AppModel.Internal.AppFactoryProviders;
 
 namespace NetDaemon.AppModel.Internal;
 
+/// <summary>
+/// Represents a set of applications
+/// </summary>
 internal class AppModelContext : IAppModelContext
 {
     private readonly List<Application> _applications = new();

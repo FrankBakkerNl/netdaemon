@@ -2,6 +2,9 @@ using NetDaemon.AppModel.Internal.AppFactories;
 
 namespace NetDaemon.AppModel.Internal;
 
+/// <summary>
+/// Represents an Application that can be either running or not.
+/// </summary>
 internal class Application : IApplication
 {
     private const int MaxTimeInInitializeAsyncInMs = 5000;
